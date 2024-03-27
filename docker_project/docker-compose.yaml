@@ -1,0 +1,67 @@
+version: '3.9'
+services:
+  mongo1:
+    image: mongo:5
+    container_name: mongo1
+    ports:
+      - "27017:27017"
+    networks:
+      - mongoCluster
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME = "admin"
+      - MONGO_INITDB_ROOT_PASSWORD = "password"
+  mongo2:
+    image: mongo:5
+    container_name: mongo2
+    ports:
+      - "27018:27017"
+    networks:
+      - mongoCluster
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME = "admin"
+      - MONGO_INITDB_ROOT_PASSWORD = "password"
+  mongo3:
+    image: mongo:5
+    container_name: mongo3
+    ports:
+      - "27019:27017"
+    networks:
+      - mongoCluster
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME = "admin"
+      - MONGO_INITDB_ROOT_PASSWORD = "password"
+  yolo5:
+    image: alexey/yolo5:latest
+    container_name: yolo5
+    ports:
+      - "8081:8081"
+    environment:
+      BUCKET_NAME: "amirz_bucket"
+    networks:
+      - mongoCluster
+  polybot:
+    image: "img_path_full_url/my_polybot:latest"
+    container_name: "my_polybot"
+    ports:
+      - "8443:8443"
+    environment:
+      TELEGRAM_TOKEN: telegram_token.txt
+      TELEGRAM_APP_URL: "my-free-ngrok-url"
+    networks:
+      - mongoCluster
+    secrets:
+      - telegram_token
+
+networks:
+  mongoCluster:
+    driver: bridge
+
+secrets:
+  telegram_token:
+    file: telegram_token.txt

@@ -1,3 +1,0 @@
-pyyaml
-loguru
-boto3

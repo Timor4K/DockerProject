@@ -5,7 +5,16 @@ from detect import run
 import uuid
 import yaml
 from loguru import logger
-import os
+import MyClassYolo
+
+# my code
+# MongoDB connection parameters
+cluster_uri = "your_mongodb_cluster_uri"  # Replace with your MongoDB cluster URI
+database_name = "your_database_name"      # Replace with your database name
+collection_name = "your_collection_name"  # Replace with your collection name
+# my code
+
+objyolo = MyClassYolo.MyClassYolo() #amirz_code
 
 images_bucket = os.environ['BUCKET_NAME']
 
@@ -26,7 +35,8 @@ def predict():
 
     # TODO download img_name from S3, store the local image path in original_img_path
     #  The bucket name should be provided as an env var BUCKET_NAME.
-    original_img_path = ...
+    #   amirz_code
+    original_img_path = objyolo.download_from_s3(objyolo.get_s3_bucket_name(), img_name)
 
     logger.info(f'prediction: {prediction_id}/{original_img_path}. Download img completed')
 
@@ -43,10 +53,13 @@ def predict():
     logger.info(f'prediction: {prediction_id}/{original_img_path}. done')
 
     # This is the path for the predicted image with labels
-    # The predicted image typically includes bounding boxes drawn around the detected objects, along with class labels and possibly confidence scores.
+    #  The predicted image typically includes bounding boxes drawn around the detected objects,
+    #   along with class labels and possibly confidence scores.
     predicted_img_path = Path(f'static/data/{prediction_id}/{original_img_path}')
 
     # TODO Uploads the predicted image (predicted_img_path) to S3 (be careful not to override the original image).
+    #  amirz_code
+    objyolo.upload_to_s3(predicted_img_path)
 
     # Parse prediction labels and create a summary
     pred_summary_path = Path(f'static/data/{prediction_id}/labels/{original_img_path.split(".")[0]}.txt')
@@ -72,7 +85,9 @@ def predict():
             'time': time.time()
         }
 
-        # TODO store the prediction_summary in MongoDB
+        # TODO store the prediction_summary in MongoDB *pip install pymongo
+        #  amirz_code
+        objyolo.store_in_mongodb(prediction_summary,cluster_uri,database_name,collection_name,time)
 
         return prediction_summary
     else:
